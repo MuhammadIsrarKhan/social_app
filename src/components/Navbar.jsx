@@ -8,8 +8,8 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { Link } from "react-router-dom";
-import { darkModeContext } from "./context/darkModeContext";
-import { AuthContext } from "./context/authContext";
+import { darkModeContext } from "../context/darkModeContext";
+import { AuthContext } from "../context/authContext";
 
 const Navbar = () => {
   const { toggle, darkMode } = useContext(darkModeContext);
@@ -44,7 +44,7 @@ const Navbar = () => {
         <NotificationsOutlinedIcon />
         <div className="flex flex-row gap-2 font-medium">
           <img
-            src="https://images.pexels.com/photos/3228727/pexels-photo-3228727.jpeg?auto=compress&cs=tinysrg&w=1600"
+            src={currentUser.profilePic}
             alt=""
             className="w-[30px] h-[30px] rounded-[50%] object-cover"
           />

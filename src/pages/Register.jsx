@@ -1,7 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 export const Register = () => {
+  const [inputs, setInputs] = useState({
+    username: "",
+    email: "",
+    password: "",
+    name: "",
+  });
+  const [err, setErr] = useState(null);
+
+  const handleChange = (e) => {
+    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const data = await axios.post(
+        "http://localhost:8800/api/auth/register",
+        inputs
+      );
+    } catch (err) {
+      setErr(err.response.data);
+    }
+  };
   return (
     <div className="bg-[rgb(193,190,255)] h-[100vh] w-[100vw] justify-center items-center flex flex-row-reverse">
       <div
@@ -26,29 +50,41 @@ export const Register = () => {
         </Link>
       </div>
       <div className="w-[25%] h-[60%] rounded-r-none rounded border bg-white flex flex-col p-6">
-        <form className="flex flex-col gap-7">
+        <form className="flex flex-col gap-7" onSubmit={submitHandler}>
           <h1 className="text-3xl font-semibold">Register</h1>
           <input
             type="text"
             className="border-b-[1px] border-solid border-b-[#d3d3d3] pb-2 focus:outline-none"
             placeholder="username"
+            name="username"
+            onChange={handleChange}
           />
           <input
             type="email"
             className="border-b-[1px] border-solid border-b-[#d3d3d3] pb-2 focus:outline-none"
             placeholder="Email"
+            name="email"
+            onChange={handleChange}
           />
           <input
             type="password"
             className="border-b-[1px] border-solid border-b-[#d3d3d3] pb-2 focus:outline-none"
             placeholder="password"
+            name="password"
+            onChange={handleChange}
           />
           <input
             type="text"
             className="border-b-[1px] border-solid border-b-[#d3d3d3] pb-2 focus:outline-none"
             placeholder="Name"
+            name="name"
+            onChange={handleChange}
           />
-          <button className="font-bold w-[60%] bg-[#938eef] text-white p-2">
+          {err && err}
+          <button
+            type="submit"
+            className="font-bold w-[60%] bg-[#938eef] text-white p-2"
+          >
             Register
           </button>
         </form>

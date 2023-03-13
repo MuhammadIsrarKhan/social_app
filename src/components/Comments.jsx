@@ -1,26 +1,36 @@
-import React, { useContext } from "react";
-import { AuthContext } from "./context/authContext";
+import React, { useContext, useState } from "react";
+import { AuthContext } from "../context/authContext";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { makeReqest } from "../axios";
+import moment from "moment";
 
-const Comments = () => {
+const Comments = ({ postId }) => {
   const { currentUser } = useContext(AuthContext);
-  const comments = [
-    {
-      id: 1,
-      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nequeaspernatur ullam aperiam. Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nequeaspernatur ullam aperiam",
-      name: "John Doe",
-      userId: 1,
-      profilePicture:
-        "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+  const [desc, setDesc] = useState("");
+  const { isLoading, error, data } = useQuery(["comments"], async () => {
+    const posts = await makeReqest.get("/comments?postId=" + postId);
+    return posts.data;
+  });
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation(
+    (newComment) => {
+      return makeReqest.post("/comments", newComment);
     },
     {
-      id: 2,
-      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nequeaspernatur ullam aperiam",
-      name: "Jane Doe",
-      userId: 2,
-      profilePicture:
-        "https://images.pexels.com/photos/1036623/pexels-photo-1036623.jpeg?auto=compress&cs=tinysrgb&w=1600",
-    },
-  ];
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["comments"]);
+      },
+    }
+  );
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+    mutation.mutate({ desc, postId });
+    setDesc("");
+  };
   return (
     <div className="comments ">
       <div className="write flex items-center justify-between gap-[20px] mx-0 my-5">
@@ -34,30 +44,39 @@ const Comments = () => {
           placeholder="write a comment"
           className="w-full border-solid border-[#d3d3d3] border-[1px] bg-transparent text-[#000] focus:outline-none dark:text-[#f5f5f5]"
           style={{ flex: "5" }}
+          onChange={(e) => setDesc(e.target.value)}
+          value={desc}
         />
-        <button className=" border-none bg-[#5271ff] text-white p-[2px] cursor-pointer rounded-[3px]">
+        <button
+          className=" border-none bg-[#5271ff] text-white p-[2px] cursor-pointer rounded-[3px]"
+          onClick={handleClick}
+        >
           Send
         </button>
       </div>
-      {comments.map((comment) => (
-        <div className="comment my-[30px] flex justify-between gap-[20px]">
-          <img
-            src={comment.profilePicture}
-            alt=""
-            className="w-[40px] h-[40px] rounded-[50%] object-cover self-center"
-          />
-          <div
-            className="info flex flex-col gap-[3px] content-start"
-            style={{ flex: "5" }}
-          >
-            <span className="font-medium">{comment.name}</span>
-            <p className="text-[#555] dark:text-[#d3d3d3]">{comment.desc}</p>
-          </div>
-          <span className="date font-medium flex-1 self-center text-[#808080] text-xs">
-            1 hour ago
-          </span>
-        </div>
-      ))}
+      {isLoading
+        ? "Loading..."
+        : data.map((comment) => (
+            <div className="comment my-[30px] flex justify-between gap-[20px]">
+              <img
+                src={comment.profilePicture}
+                alt=""
+                className="w-[40px] h-[40px] rounded-[50%] object-cover self-center"
+              />
+              <div
+                className="info flex flex-col gap-[3px] content-start"
+                style={{ flex: "5" }}
+              >
+                <span className="font-medium">{comment.name}</span>
+                <p className="text-[#555] dark:text-[#d3d3d3]">
+                  {comment.desc}
+                </p>
+              </div>
+              <span className="date font-medium flex-1 self-center text-[#808080] text-xs">
+                {moment(comment.createAt).fromNow()}
+              </span>
+            </div>
+          ))}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { AuthContext } from "./context/authContext";
+import { AuthContext } from "../context/authContext";
 
 const Stories = () => {
   const { currentUser } = useContext(AuthContext);
@@ -29,7 +29,11 @@ const Stories = () => {
   return (
     <div className="flex gap-3 h-[200px] mb-7">
       <div className="flex flex-1 rounded-[10px] overflow-hidden relative">
-        <img src={currentUser.profilePic} alt="" className="w-full h-full" />
+        <img
+          src={currentUser.profilePic}
+          alt=""
+          className="w-full h-full object-cover"
+        />
         <span className="absolute bottom-2 left-3 font-medium text-white">
           {currentUser.name}
         </span>

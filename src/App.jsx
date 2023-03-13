@@ -14,12 +14,15 @@ import Rightbar from "./components/Rightbar";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import { useContext, useEffect } from "react";
-import { darkModeContext } from "./components/context/darkModeContext";
-import { AuthContext } from "./components/context/authContext";
+import { AuthContext } from "./context/authContext";
+import { darkModeContext } from "./context/darkModeContext";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
   const { darkMode } = useContext(darkModeContext);
+
+  const queryclient = new QueryClient();
 
   useEffect(() => {
     if (darkMode) {
@@ -31,20 +34,22 @@ function App() {
 
   const Layout = () => {
     return (
-      <div>
-        <Navbar />
-        <div className="flex ">
-          <div className="lg:block hidden sm:block" style={{ flex: "2" }}>
-            <Leftbar />
-          </div>
-          <div style={{ flex: "6" }}>
-            <Outlet />
-          </div>
-          <div className="lg:block hidden" style={{ flex: "3" }}>
-            <Rightbar />
+      <QueryClientProvider client={queryclient}>
+        <div>
+          <Navbar />
+          <div className="flex ">
+            <div className="lg:block hidden sm:block" style={{ flex: "2" }}>
+              <Leftbar />
+            </div>
+            <div style={{ flex: "6" }}>
+              <Outlet />
+            </div>
+            <div className="lg:block hidden" style={{ flex: "3" }}>
+              <Rightbar />
+            </div>
           </div>
         </div>
-      </div>
+      </QueryClientProvider>
     );
   };
 
